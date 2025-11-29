@@ -121,13 +121,19 @@
             color: #666;
             margin-top: 5px;
         }
+        .error {
+    color: red;
+    font-size: 14px;
+    display: block;
+    margin-top: 5px;
+}
     </style>
 </head>
 <body>
     <div class="container">
         <h1>
             <c:choose>
-                <c:when test="${student != null}">
+                <c:when test="${action == 'update'}">
                     ✏️ Edit Student
                 </c:when>
                 <c:otherwise>
@@ -139,9 +145,8 @@
        <form action="${pageContext.request.contextPath}/student" method="POST">
 
             <!-- Hidden field for action -->
-            <input type="hidden" name="action" 
-                   value="${student != null ? 'update' : 'insert'}">
-            
+            <input type="hidden" name="action" value="${action}">
+
             <!-- Hidden field for ID (only for update) -->
             <c:if test="${student != null}">
                 <input type="hidden" name="id" value="${student.id}">
@@ -152,12 +157,21 @@
                 <label for="studentCode">
                     Student Code <span class="required">*</span>
                 </label>
-                <input type="text" 
-                       id="studentCode" 
-                       name="studentCode" 
-                       value="${student.studentCode}"
-                       ${student != null ? 'readonly' : 'required'}
-                       placeholder="e.g., SV001, IT123">
+                <input 
+    type="text"
+    id="studentCode"
+    name="studentCode"
+    value="${student.studentCode}"
+    placeholder="e.g., SV001, IT123"
+    <c:if test="${action == 'insert'}">required</c:if>
+<c:if test="${action == 'update'}">readonly</c:if>
+>
+                
+    <!-- ERROR MESSAGE -->
+    <c:if test="${not empty errorCode}">
+        <span class="error">${errorCode}</span>
+    </c:if>
+
                 <p class="info-text">Format: 2 letters + 3+ digits</p>
             </div>
             
@@ -173,6 +187,11 @@
                        required
                        placeholder="Enter full name">
             </div>
+                       
+                           <!-- ERROR MESSAGE -->
+    <c:if test="${not empty errorName}">
+        <span class="error">${errorName}</span>
+    </c:if>
             
             <!-- Email -->
             <div class="form-group">
@@ -185,6 +204,11 @@
                        value="${student.email}"
                        required
                        placeholder="student@example.com">
+                
+                  <!-- ERROR MESSAGE -->
+    <c:if test="${not empty errorEmail}">
+        <span class="error">${errorEmail}</span>
+    </c:if>
             </div>
             
             <!-- Major -->
@@ -211,13 +235,18 @@
                         Business Administration
                     </option>
                 </select>
+                        
+                            <!-- ERROR MESSAGE -->
+    <c:if test="${not empty errorMajor}">
+        <span class="error">${errorMajor}</span>
+    </c:if>
             </div>
             
             <!-- Buttons -->
             <div class="button-group">
                 <button type="submit" class="btn btn-primary">
                     <c:choose>
-                        <c:when test="${student != null}">
+                        <c:when test="${action == 'update'}">
                             💾 Update Student
                         </c:when>
                         <c:otherwise>
